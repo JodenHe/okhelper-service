@@ -14,16 +14,18 @@ import com.ok.okhelper.util.COSUtil;
 import io.swagger.annotations.*;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.shiro.authz.annotation.RequiresAuthentication;
 import org.apache.shiro.authz.annotation.RequiresPermissions;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.core.io.ResourceLoader;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import javax.servlet.http.HttpServletRequest;
 import java.io.IOException;
+import java.nio.file.Paths;
 import java.util.Map;
 
 /**
@@ -45,6 +47,9 @@ public class UploadController {
     @Autowired
     private UserMapper userMapper;
 
+    @Autowired
+    private ResourceLoader resourceLoader;
+
     @Value("${cos.server.http.prefix}")
     private String cosHttpPrefix;
 
@@ -60,20 +65,25 @@ public class UploadController {
     @Value("${cos.path.store-logo}")
     private String cosPathStoreLogo;
 
+    @Value("${upload.local.img.path}")
+    private String localImgPath;
+
 
     @PostMapping(value = "/upload/img")
     @ApiOperation(value = "上传图片(包括商品图片、分类图片等等，用户头像请转到头像上传接口)", notes = "此接口只上传图片，无业务逻辑")
     @ApiImplicitParams(@ApiImplicitParam(name = "file", value = "文件", required = true, dataType = "File"))
     public ServerResponse<UploadVo> uploadImg(@RequestParam("file") MultipartFile file, HttpServletRequest request) {
         if (!file.isEmpty() && file.getContentType().startsWith("image")) {
-            //定义临时文件夹
+            /*//定义临时文件夹
             String tmp_path = request.getSession().getServletContext().getRealPath("tmp");
 
             String targetFileName = uploadService.upload(file, tmp_path, cosPathImg);
 
             String url = cosHttpPrefix + cosPathImg + targetFileName;
 
-            UploadVo uploadVo = new UploadVo(targetFileName, url);
+            UploadVo uploadVo = new UploadVo(targetFileName, url);*/
+
+            UploadVo uploadVo = uploadService.localUpload(file);
 
             return ServerResponse.createBySuccess(uploadVo);
         } else {
@@ -89,15 +99,21 @@ public class UploadController {
         if (!file.isEmpty() && file.getContentType().startsWith("image")) {
 
             //定义临时文件夹
-            String tmp_path = request.getSession().getServletContext().getRealPath("tmp");
+            /*String tmp_path = request.getSession().getServletContext().getRealPath("tmp");
 
             String targetFileName = uploadService.upload(file, tmp_path, cosPathAvator);
-            String url = cosHttpPrefix + cosPathAvator + targetFileName;
+            String url = cosHttpPrefix + cosPathAvator + targetFileName;*/
+
+            UploadVo uploadVo = uploadService.localUpload(file);
+            String url = uploadVo.getUrl();
+
+
             User dbuser = userMapper.selectByPrimaryKey(JWTUtil.getUserId());
 
             //删除旧头像
             if (StringUtils.isNotBlank(dbuser.getUserAvatar())) {
-                COSUtil.deleteFile(dbuser.getUserAvatar());
+//                COSUtil.deleteFile(dbuser.getUserAvatar());
+                uploadService.localDeleteFile(dbuser.getUserAvatar());
             }
 
             //更新用户头像
@@ -106,7 +122,7 @@ public class UploadController {
             user.setUserAvatar(url);
             userMapper.updateByPrimaryKeySelective(user);
 
-            UploadVo uploadVo = new UploadVo(targetFileName, url);
+//            UploadVo uploadVo = new UploadVo(targetFileName, url);
 
             return ServerResponse.createBySuccess(uploadVo);
         } else {
@@ -125,12 +141,15 @@ public class UploadController {
                                                     @RequestParam(required = true) String codeType, HttpServletRequest request) throws IOException {
         if (!file.isEmpty() && file.getContentType().startsWith("image")) {
 
-            //定义临时文件夹
+            /*//定义临时文件夹
             String tmp_path = request.getSession().getServletContext().getRealPath("tmp");
 
             String targetFileName = uploadService.upload(file, tmp_path, cosPathMoneyCode);
 
-            String url = cosHttpPrefix + cosPathMoneyCode + targetFileName;
+            String url = cosHttpPrefix + cosPathMoneyCode + targetFileName;*/
+
+            UploadVo uploadVo = uploadService.localUpload(file);
+            String url = uploadVo.getUrl();
 
             //修改收款码
             Store dbstore = storeMapper.selectByPrimaryKey(JWTUtil.getStoreId());
@@ -148,7 +167,7 @@ public class UploadController {
 
             storeMapper.updateByPrimaryKeySelective(store);
 
-            UploadVo uploadVo = new UploadVo(targetFileName, url);
+//            UploadVo uploadVo = new UploadVo(targetFileName, url);
 
             return ServerResponse.createBySuccess(uploadVo);
         } else {
@@ -164,12 +183,15 @@ public class UploadController {
     public ServerResponse<UploadVo> uploadStoreLogo(@RequestParam("file") MultipartFile file, HttpServletRequest request) throws IOException {
         if (!file.isEmpty() && file.getContentType().startsWith("image")) {
 
-            //定义临时文件夹
+            /*//定义临时文件夹
             String tmp_path = request.getSession().getServletContext().getRealPath("tmp");
 
             String targetFileName = uploadService.upload(file, tmp_path, cosPathStoreLogo);
 
-            String url = cosHttpPrefix + cosPathStoreLogo + targetFileName;
+            String url = cosHttpPrefix + cosPathStoreLogo + targetFileName;*/
+
+            UploadVo uploadVo = uploadService.localUpload(file);
+            String url = uploadVo.getUrl();
 
             //修改收款码
             Store dbstore = storeMapper.selectByPrimaryKey(JWTUtil.getStoreId());
@@ -179,7 +201,8 @@ public class UploadController {
 
             //删除旧图片
             if (StringUtils.isNotBlank(dbstore.getStoreLogo())) {
-                COSUtil.deleteFile(dbstore.getStoreLogo());
+//                COSUtil.deleteFile(dbstore.getStoreLogo());
+                uploadService.localDeleteFile(dbstore.getStoreLogo());
             }
 
             Store store = new Store();
@@ -188,7 +211,7 @@ public class UploadController {
 
             storeMapper.updateByPrimaryKeySelective(store);
 
-            UploadVo uploadVo = new UploadVo(targetFileName, url);
+//            UploadVo uploadVo = new UploadVo(targetFileName, url);
 
             return ServerResponse.createBySuccess(uploadVo);
         } else {
@@ -197,5 +220,22 @@ public class UploadController {
 
     }
 
+
+    /**
+     * 显示图片的方法关键 匹配路径像 localhost:8080/b7c76eb3-5a67-4d41-ae5c-1642af3f8746.png
+     * 参考：https://blog.csdn.net/a625013/article/details/52414470
+     * @param fileName
+     * @return
+     */
+    @GetMapping(value = "/public/file/{fileName:.+}")
+    @ResponseBody
+    public ResponseEntity<?> getFile(@PathVariable String fileName) {
+        try {
+            return ResponseEntity.ok(resourceLoader.getResource("file:" + Paths.get(localImgPath, fileName)));
+        } catch (Exception e) {
+            log.error("【显示图片出错！】,Exception = {}", e);
+            return ResponseEntity.notFound().build();
+        }
+    }
 
 }

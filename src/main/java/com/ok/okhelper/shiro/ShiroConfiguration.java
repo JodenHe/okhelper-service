@@ -15,6 +15,7 @@ import org.springframework.context.annotation.DependsOn;
 
 import javax.servlet.Filter;
 import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.Map;
 
 /*
@@ -47,7 +48,7 @@ public class ShiroConfiguration {
          * 自定义url规则
          * http://shiro.apache.org/web.html#urls-
          */
-        final Map<String, String> filterRuleMap = new HashMap<>();
+        final Map<String, String> filterRuleMap = new LinkedHashMap<>();
 
         // 访问401和404页面不通过我们的Filter
         filterRuleMap.put("/401", "anon");
@@ -57,6 +58,7 @@ public class ShiroConfiguration {
         filterRuleMap.put("/webjar/**", "anon");
         filterRuleMap.put("/v2/api-docs", "anon");
         filterRuleMap.put("/doc.html", "anon");
+        filterRuleMap.put("/public/**", "anon");
 
         filterRuleMap.put("/user/login", "anon");
         filterRuleMap.put("/user/register", "anon");
