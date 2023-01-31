@@ -26,4 +26,12 @@ jobs:
         SSH_PRIVATE_KEY: ${{ secrets.DEPLOY_KEY }}
         SOURCE: "target/okhelper-service.jar"
         TARGET: "/home/ubuntu/workspace/okhelper/"
-      
+        
+    - name: Setup ssh-agent
+      uses: webfactory/ssh-agent@v0.7.0
+      with:
+        # Private SSH key to register in the SSH agent
+        ssh-private-key:  ${{ secrets.DEPLOY_KEY }}
+        
+    - name: Restart service
+      run: ssh ${{ secrets.USER }}@${{ secrets.HOST }} "cd /home/ubuntu/workspace/okhelper/ && chmod +x run.sh && ./run.sh"
