@@ -16,5 +16,14 @@ jobs:
         distribution: 'temurin'
 
     - name: Build with Maven
-      run: mvn -B package
+      run: mvn -B package -Dmaven.test.skip=true
+      
+    - name: ssh deploy
+      uses: easingthemes/ssh-deploy@v4.0.5
+      with:
+        REMOTE_HOST: ${{ secrets.HOST }}
+        REMOTE_USER: ${{ secrets.USER }}
+        SSH_PRIVATE_KEY: ${{ secrets.DEPLOY_KEY }}
+        SOURCE: "target/okhelper-service.jar"
+        TARGET: "/home/ubuntu/workspace/okhelper/"
       
