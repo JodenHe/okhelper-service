@@ -172,6 +172,7 @@
     <!--</dependency>-->
 
     <build>
+        <finalName>okhelper-service</finalName>
         <plugins>
             <plugin>
                 <groupId>org.springframework.boot</groupId>
