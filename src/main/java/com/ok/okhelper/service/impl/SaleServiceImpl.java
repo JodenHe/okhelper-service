@@ -29,6 +29,7 @@ import com.ok.okhelper.service.ProductService;
 import com.ok.okhelper.service.SaleService;
 import com.ok.okhelper.shiro.JWTUtil;
 import com.ok.okhelper.util.AliPayUtil;
+import com.ok.okhelper.util.CommonUtil;
 import com.ok.okhelper.util.NumberGenerator;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.collections.CollectionUtils;
@@ -185,6 +186,9 @@ public class SaleServiceImpl implements SaleService {
         saleOrder.setStoreId(storeId);
         saleOrder.setSeller(seller);
         saleOrder.setLogisticsStatus(ConstEnum.LOGISTICSSTATUS_NOSEND.getCode());
+        if (saleOrder.getSumPrice() != null) {
+            saleOrder.setToBePaid(saleOrder.getSumPrice().subtract(CommonUtil.nvl(saleOrder.getRealPay(), BigDecimal.ZERO)));
+        }
 
         saleOrderMapper.insertSelective(saleOrder);
 
@@ -351,6 +355,9 @@ public class SaleServiceImpl implements SaleService {
             throw new AuthorizationException("资源不在你当前商铺查看范围");
         }
         ThreadContext.unbindSubject();
+        if (ConstEnum.SALESTATUS_NOPAYMENT.getCode() != saleOrder.getOrderStatus()) {
+            throw new IllegalException("只有未付款订单允许关闭");
+        }
         if (ConstEnum.SALESTATUS_CLOSE.getCode() == saleOrder.getOrderStatus()) {
             throw new IllegalException("订单已关闭");
         }
