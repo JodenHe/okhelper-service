@@ -330,7 +330,7 @@ public class SaleServiceImpl implements SaleService {
         newSaleOrder.setLogisticsStatus(ConstEnum.LOGISTICSSTATUS_RECEIVED.getCode());
         newSaleOrder.setCloseTime(new Date());
         //如果已付全款则变更为交易完成
-        if (ConstEnum.SALESTATUS_PAID.getCode() == newSaleOrder.getOrderStatus()) {
+        if (ConstEnum.SALESTATUS_PAID.getCode() == saleOrder.getOrderStatus()) {
             newSaleOrder.setOrderStatus(ConstEnum.SALESTATUS_SUCCESS.getCode());
             newSaleOrder.setSuccessTime(new Date());
         }
