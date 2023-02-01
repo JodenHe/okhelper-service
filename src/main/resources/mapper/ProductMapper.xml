@@ -37,6 +37,7 @@
             <arg column="product_title" javaType="java.lang.String" jdbcType="VARCHAR"/>
             <arg column="sales_stock" javaType="java.lang.Integer" jdbcType="INTEGER"/>
             <arg column="retail_price" javaType="java.math.BigDecimal" jdbcType="DECIMAL"/>
+            <arg column="storage_price" javaType="java.math.BigDecimal" jdbcType="DECIMAL"/>
             <arg column="main_img" javaType="java.lang.String" jdbcType="VARCHAR"/>
             <arg column="create_time" javaType="java.util.Date" jdbcType="TIMESTAMP"/>
             <arg column="update_time" javaType="java.util.Date" jdbcType="TIMESTAMP"/>
@@ -85,8 +86,18 @@
     </update>
 
     <select id="getProductsList" resultMap="ProductVoMap">
-        SELECT id,product_name,product_title,sales_stock,retail_price,main_img,create_time,update_time
-        FROM product
+        SELECT p.id,
+               p.product_name,
+               p.product_title,
+               p.sales_stock,
+               p.retail_price,
+               p.main_img,
+               p.create_time,
+               p.update_time,
+               (select sum(sod.storage_price*sod.storage_count)/sum(sod.storage_count)
+                  from storage_order_detail sod
+                 where sod.product_id = p.id) as storage_price
+        FROM product p
         <where>
             AND delete_status = 1 AND store_id = ${storeId}
             <if test=" condition != null and condition != ''">
@@ -108,8 +119,11 @@
     </update>
 
     <select id="getProductsListByCategoryId" resultMap="ProductVoMap" parameterType="map">
-        SELECT id,product_name,product_title,sales_stock,retail_price,main_img,create_time,update_time
-        FROM product WHERE category_id in
+        SELECT id,product_name,product_title,sales_stock,retail_price,main_img,create_time,update_time,
+               (select sum(sod.storage_price*sod.storage_count)/sum(sod.storage_count)
+                  from storage_order_detail sod
+                 where sod.product_id = p.id) as storage_price
+          FROM product p WHERE category_id in
         <foreach collection="categoryListTotal" item="c" index="index"
                  open="(" close=")" separator=",">
             #{c.id}

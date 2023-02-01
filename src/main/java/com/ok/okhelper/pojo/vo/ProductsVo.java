@@ -41,6 +41,11 @@ public class ProductsVo {
 	 * 零售价
 	 */
 	private BigDecimal retailPrice;
+
+	/**
+	 * 进货价
+	 */
+	private BigDecimal storagePrice;
 	
 	/**
 	 * 主图
@@ -56,14 +61,15 @@ public class ProductsVo {
 	 * 更新日期
 	 */
 	private Date updateTime;
-	
-	
-	public ProductsVo(Long id, String productName, String productTitle, Integer salesStock, BigDecimal retailPrice, String mainImg, Date createTime, Date updateTime) {
+
+
+	public ProductsVo(Long id, String productName, String productTitle, Integer salesStock, BigDecimal retailPrice, BigDecimal storagePrice, String mainImg, Date createTime, Date updateTime) {
 		this.id = id;
 		this.productName = productName;
 		this.productTitle = productTitle;
 		this.salesStock = salesStock;
 		this.retailPrice = retailPrice;
+		this.storagePrice = storagePrice;
 		this.mainImg = mainImg;
 		this.createTime = createTime;
 		this.updateTime = updateTime;
