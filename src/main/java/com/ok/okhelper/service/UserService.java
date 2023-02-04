@@ -79,4 +79,11 @@ public interface UserService {
 	void changeEmplyeeStatus(Long userId, Integer status);
     
     User getUserInfoByUserName(String userName);
+
+    /**
+     * 更新用户信息
+     * @param id
+     * @param userDto
+     */
+    void updateEmployee(Long id, UserUpdateDto userDto);
 }

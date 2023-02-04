@@ -153,6 +153,7 @@ public class UserController {
     @ApiOperation(value = "修改个人信息")
     @PutMapping("/user/myInfo")
     public ServerResponse updateMyInfo(UserUpdateDto userDto){
+        userDto.setDeleteStatus(null);
         userService.updateMyInfo(userDto);
         return ServerResponse.createBySuccess("修改成功");
     }
@@ -170,10 +171,9 @@ public class UserController {
     
     //---------------------------------------------------------------------------------------------------------------------------------------------------------
 
-    //暂时不用
-    @ApiIgnore
+    @ApiOperation(value = "用户列表")
     @RequiresPermissions("user/userList:get")
-    @GetMapping("/user")
+    @GetMapping("/user/list")
     public ServerResponse getUserListByStoreId(HttpServletRequest request) {
         String token = request.getHeader("token");
         return userService.getUserListByStoreId(token);
@@ -183,5 +183,13 @@ public class UserController {
     @RequestMapping("/logout")
     public Object logOut(HttpSession session) {
         return "登出";
+    }
+
+    @RequiresPermissions("employee:edit")
+    @PutMapping("/user/employee/{id}")
+    @ApiOperation(value = "更新用户信息", notes = "更新用户信息")
+    public ServerResponse updateEmployee(@PathVariable("id") Long id, @RequestBody UserUpdateDto userDto) {
+         userService.updateEmployee(id, userDto);
+        return ServerResponse.createBySuccess("修改成功");
     }
 }

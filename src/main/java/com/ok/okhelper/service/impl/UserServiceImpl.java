@@ -471,25 +471,7 @@ public class UserServiceImpl implements UserService {
         if (id == null) {
             throw new IllegalException("登陆错误");
         }
-        String newPassword = userDto.getUserPassword();
-
-        if (!StringUtils.isBlank(newPassword)) {
-            newPassword = PasswordHelp.passwordSalt(JWTUtil.getUsername(), newPassword);
-        }
-
-        User user = new User();
-        user.setUpdateTime(new Date());
-        BeanUtils.copyProperties(userDto, user);
-        user.setUserPassword(newPassword);
-        user.setId(id);
-        try {
-            userMapper.updateByPrimaryKeySelective(user);
-        } catch (Exception e) {
-            e.printStackTrace();
-            throw new IllegalException("修改失败" + e.getMessage());
-        }
-
-
+        this.updateEmployee(id, userDto);
     }
 
     /*
@@ -576,4 +558,27 @@ public class UserServiceImpl implements UserService {
 		
 		return user1;
 	}
+
+    @Override
+    public void updateEmployee(Long id, UserUpdateDto userDto) {
+        String newPassword = userDto.getUserPassword();
+
+        if (!StringUtils.isBlank(newPassword)) {
+            newPassword = PasswordHelp.passwordSalt(JWTUtil.getUsername(), newPassword);
+        }
+
+        User user = new User();
+        user.setUpdateTime(new Date());
+        BeanUtils.copyProperties(userDto, user);
+        user.setUserPassword(newPassword);
+        user.setId(id);
+        try {
+            userMapper.updateByPrimaryKeySelective(user);
+        } catch (Exception e) {
+            e.printStackTrace();
+            throw new IllegalException("修改失败" + e.getMessage());
+        }
+    }
+
+
 }

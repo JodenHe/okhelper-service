@@ -71,5 +71,11 @@ public class UserUpdateDto {
 	@DateTimeFormat(pattern = "yyyy-MM-dd")
 	@ApiModelProperty(value = "生日")
 	private Date userBirthday;
+
+	/**
+	 * 状态 0废除，1激活
+	 */
+	@ApiModelProperty(value = "状态")
+	private String deleteStatus;
 	
 }
