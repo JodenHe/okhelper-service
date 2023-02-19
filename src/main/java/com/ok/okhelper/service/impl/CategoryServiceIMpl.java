@@ -21,6 +21,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
 /*
@@ -169,17 +170,21 @@ public class CategoryServiceIMpl implements CategoryService {
 	public void addCategory(CategoryDto categoryDto) {
 		
 		logger.info("Enter method addCategory() params："+categoryDto);
-		if(StringUtils.isBlank(categoryDto.getCategoryName())
-				|| categoryDto.getSuperId() == null
-				){
-			throw new IllegalException("参数不全");
+		if(StringUtils.isBlank(categoryDto.getCategoryName())) {
+			throw new IllegalException("参数不全, 分类名称不能为空");
 		}
-		
-//		Category c = categoryMapper.selectByPrimaryKey(categoryDto.getSuperId());
-////		if( c == null || c.getDeleteStatus() == 0)
-////		{
-////			throw new IllegalException("父类不存在");
-////		}
+
+		if (categoryDto.getSuperId() == null) {
+			categoryDto.setSuperId(0L);
+		}
+
+		if (categoryDto.getSuperId() != 0L) {
+			Category c = categoryMapper.selectByPrimaryKey(categoryDto.getSuperId());
+			if( c == null || c.getDeleteStatus() == 0) {
+				throw new IllegalException("父类不存在");
+			}
+		}
+
 		Category category = new Category();
 		BeanUtils.copyProperties(categoryDto,category);
 		category.setStoreId(JWTUtil.getStoreId());
@@ -191,7 +196,25 @@ public class CategoryServiceIMpl implements CategoryService {
 		logger.info("Exit method addCategory() return：");
 		
 	}
-	
+
+	@Override
+	public void updateCategory(CategoryDto categoryDto) {
+
+		logger.info("Enter method updateCategory() params：{}", categoryDto);
+		if(StringUtils.isBlank(categoryDto.getCategoryName())) {
+			throw new IllegalException("参数不全, 分类名称不能为空");
+		}
+
+		Category record = categoryMapper.selectByPrimaryKey(categoryDto.getId());
+		record.setCategoryName(categoryDto.getCategoryName());
+		record.setRemarks(categoryDto.getRemarks());
+		record.setUpdateTime(new Date());
+
+		categoryMapper.updateByPrimaryKey(record);
+
+		logger.info("Exit method updateCategory() return：");
+	}
+
 	@Override
 	public List<IdAndNameBo> getCategoryIdAndNameList() {
 		

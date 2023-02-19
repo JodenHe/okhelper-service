@@ -75,6 +75,16 @@ public class CategoryControler {
 		logger.info("Exit method getAllCategory() return：");
 		return ServerResponse.createBySuccess("添加成功");
 	}
+
+	@RequiresPermissions("category:edit")
+	@ApiOperation(value = "分类添加",notes = "分类添加")
+	@PutMapping("/categorys")
+	public ServerResponse<String> updateCategory(@Valid CategoryDto categoryDto){
+		logger.info("Enter method updateCategory() params："+categoryDto);
+		categoryService.updateCategory(categoryDto);
+		logger.info("Exit method getAllCategory() return：");
+		return ServerResponse.createBySuccess("更新成功");
+	}
 	
 	@RequiresPermissions("category:view")
 	@ApiOperation(value = "当前分类查询")

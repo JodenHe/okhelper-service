@@ -19,6 +19,8 @@ public interface CategoryService {
 	int deleteCategory(long id);
 	
 	void addCategory(CategoryDto categoryDto);
+
+	void updateCategory(CategoryDto categoryDto);
 	
 	List<IdAndNameBo> getCategoryIdAndNameList();
 	
