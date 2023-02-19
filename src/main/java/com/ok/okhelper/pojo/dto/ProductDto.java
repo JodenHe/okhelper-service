@@ -86,6 +86,9 @@ public class ProductDto {
 	 */
 	@ApiModelProperty(value = "条码")
 	private String barCode;
+
+	@ApiModelProperty(value = "状态, 1: 上架, 0: 下架")
+	private Integer deleteStatus;
 	
 	
 }

@@ -1,7 +1,10 @@
 package com.ok.okhelper.pojo.dto;
 
+import com.ok.okhelper.pojo.vo.CategoryVo;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
+
+import java.util.List;
 
 /*
 *Author:zhangxin_an
@@ -13,8 +16,15 @@ public class ProductCondition {
 	
 	@ApiModelProperty(value = "搜索关键字")
 	private String condition;
-	@ApiModelProperty(value = "排序规则（数据库字段）")
-	private String orderBy;
+
+	@ApiModelProperty(value = "分类Id")
+	private Long categoryId;
+
+	@ApiModelProperty(value = "分类数组", hidden = true)
+	private List<CategoryVo> categoryList;
+
+	@ApiModelProperty(value = "状态, 1: 上架, 0: 下架")
+	private Integer deleteStatus;
 
 //	/**
 //	 * 商品名

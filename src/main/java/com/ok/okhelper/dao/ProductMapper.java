@@ -1,6 +1,7 @@
 package com.ok.okhelper.dao;
 
 import com.ok.okhelper.pojo.bo.IdAndNameBo;
+import com.ok.okhelper.pojo.dto.ProductCondition;
 import com.ok.okhelper.pojo.po.Product;
 import com.ok.okhelper.pojo.vo.CategoryVo;
 import com.ok.okhelper.pojo.vo.ProductStockVo;
@@ -38,4 +39,11 @@ public interface ProductMapper extends MyMapper<Product> {
     Integer getSaleStockLock(Long productId);
     
     ProductStockVo getProductStockVoByPK(Long productId);
+
+    /**
+     * 列表查询
+     * @param condition
+     * @return
+     */
+    List<ProductsVo> list(ProductCondition condition);
 }

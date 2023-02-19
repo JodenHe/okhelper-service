@@ -62,6 +62,8 @@ public class ProductsVo {
 	 */
 	private Date updateTime;
 
+	private Integer deleteStatus;
+
 
 	public ProductsVo(Long id, String productName, String productTitle, Integer salesStock, BigDecimal retailPrice, BigDecimal storagePrice, String mainImg, Date createTime, Date updateTime) {
 		this.id = id;

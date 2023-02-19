@@ -180,5 +180,31 @@
         where delete_status = 1 and id = #{productId}
     </select>
 
+    <select id="list" resultType="com.ok.okhelper.pojo.vo.ProductsVo">
+        select p.*,
+               (select sum(sod.storage_price*sod.storage_count)/sum(sod.storage_count)
+                  from storage_order_detail sod
+                 where sod.product_id = p.id) as storage_price
+          from product p
+        <where>
+            <if test="deleteStatus != null">
+                and p.delete_status = #{deleteStatus}
+            </if>
+            <if test=" condition != null and condition != ''">
+                AND (p.product_name LIKE concat('%', concat(#{condition}, '%'))
+                OR p.article_number = #{condition}
+                OR p.bar_code = #{condition}
+                )
+            </if>
+            <if test="categoryList != null and categoryList.size() > 0">
+                and p.category_id in
+                <foreach collection="categoryList" item="item" index="index"
+                         open="(" close=")" separator=",">
+                    #{item.id}
+                </foreach>
+            </if>
+        </where>
+    </select>
+
 
 </mapper>

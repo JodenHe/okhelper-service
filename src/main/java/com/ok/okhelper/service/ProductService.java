@@ -1,6 +1,7 @@
 package com.ok.okhelper.service;
 
 import com.ok.okhelper.common.PageModel;
+import com.ok.okhelper.pojo.dto.ProductCondition;
 import com.ok.okhelper.pojo.dto.ProductDto;
 import com.ok.okhelper.pojo.po.Product;
 import com.ok.okhelper.pojo.vo.ProductNearDayVo;
@@ -38,4 +39,12 @@ public interface ProductService {
 	
 	
 	List<StockByBatchVo> getstockWithBatch(Long pid);
+
+	/**
+	 * 分页查询
+	 * @param condition
+	 * @param pageModel
+	 * @return
+	 */
+	PageModel<ProductsVo> page(ProductCondition condition, PageModel pageModel);
 }

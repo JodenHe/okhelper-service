@@ -3,6 +3,7 @@ package com.ok.okhelper.service.impl;
 import com.github.pagehelper.PageHelper;
 import com.github.pagehelper.PageInfo;
 import com.ok.okhelper.common.PageModel;
+import com.ok.okhelper.dao.CategoryMapper;
 import com.ok.okhelper.dao.ProductMapper;
 import com.ok.okhelper.dao.StockMapper;
 import com.ok.okhelper.dao.WarehouseMapper;
@@ -11,7 +12,9 @@ import com.ok.okhelper.exception.NotFoundException;
 import com.ok.okhelper.pojo.bo.IdAndNameBo;
 import com.ok.okhelper.pojo.bo.ProductStockBo;
 import com.ok.okhelper.pojo.bo.StockBo;
+import com.ok.okhelper.pojo.dto.ProductCondition;
 import com.ok.okhelper.pojo.dto.ProductDto;
+import com.ok.okhelper.pojo.po.Category;
 import com.ok.okhelper.pojo.po.Product;
 import com.ok.okhelper.pojo.vo.*;
 import com.ok.okhelper.service.CategoryService;
@@ -42,19 +45,22 @@ public class ProductServiceImpl implements ProductService {
 	Logger logger = LoggerFactory.getLogger(this.getClass());
 	
 	@Autowired
-	ProductMapper productMapper;
+	private ProductMapper productMapper;
 	
 	@Autowired
-	CategoryService categoryService;
+	private CategoryService categoryService;
 	
 	@Autowired
-	StockMapper stockMapper;
+	private StockMapper stockMapper;
 	
 	@Autowired
-	WarehouseMapper warehouseMapper;
+	private WarehouseMapper warehouseMapper;
 	
 	@Autowired
-	StockService stockService;
+	private StockService stockService;
+
+	@Autowired
+	private CategoryMapper categoryMapper;
 	
 	
 	/*
@@ -164,10 +170,10 @@ public class ProductServiceImpl implements ProductService {
 		
 		Product product = productMapper.selectByPrimaryKey(pId);
 		
-		if (product == null || product.getDeleteStatus() == 0 || !product.getStoreId().equals(JWTUtil.getStoreId())) {
+		if (product == null) {
 			throw new NotFoundException("查询不存在");
 		}
-		
+
 		logger.info("Exit method getProduct(long pId) return:" + product);
 		return product;
 	}
@@ -405,5 +411,36 @@ public class ProductServiceImpl implements ProductService {
 		logger.info("Exit method getLowCountProduct  return:" + stockByBatchVos);
 		
 		return stockByBatchVos;
+	}
+
+	@Override
+	public PageModel<ProductsVo> page(ProductCondition condition, PageModel pageModel) {
+		Long storeId = JWTUtil.getStoreId();
+		if (storeId == null) {
+			throw new AuthenticationException("登陆异常");
+		}
+
+		if (condition.getCondition() != null) {
+			condition.setCondition(condition.getCondition().trim());
+		}
+
+		if (condition.getCategoryId() != null) {
+			//获取分类子类
+			List<CategoryVo> categoryList = categoryService.getCategoryAllItems(condition.getCategoryId(), storeId);
+
+			CategoryVo categoryVo = new CategoryVo();
+			categoryVo.setId(condition.getCategoryId());
+			categoryList.add(categoryVo);
+			condition.setCategoryList(categoryList);
+		}
+
+		//启动分页
+		PageHelper.startPage(pageModel.getPageNum(), pageModel.getLimit());
+		//启动排序
+		PageHelper.orderBy(pageModel.getOrderBy());
+		List<ProductsVo> list = productMapper.list(condition);
+
+		PageInfo<ProductsVo> pageInfo = new PageInfo<>(list);
+		return PageModel.convertToPageModel(pageInfo);
 	}
 }

@@ -2,6 +2,7 @@ package com.ok.okhelper.controller;
 
 import com.ok.okhelper.common.PageModel;
 import com.ok.okhelper.common.ServerResponse;
+import com.ok.okhelper.pojo.dto.ProductCondition;
 import com.ok.okhelper.pojo.dto.ProductDto;
 import com.ok.okhelper.pojo.po.Product;
 import com.ok.okhelper.pojo.vo.ProductNearDayVo;
@@ -34,7 +35,15 @@ public class ProductController {
 	Logger logger = LoggerFactory.getLogger(this.getClass());
 	
 	@Autowired
-	ProductService productService;
+	private ProductService productService;
+
+	@RequiresPermissions("product:view")
+	@ApiOperation(value = "商品分页搜索")
+	@GetMapping("product/page")
+	public ServerResponse<PageModel<ProductsVo>> page(ProductCondition condition, @Valid PageModel pageModel) {
+		PageModel<ProductsVo> productsVoPageModel = productService.page(condition, pageModel);
+		return ServerResponse.createBySuccess(productsVoPageModel);
+	}
 	
 	@RequiresPermissions("product:view")
 	@ApiOperation(value = "商品搜索", notes = "指定查询条件搜索")
